@@ -1,0 +1,6 @@
+/crates
+/results
+/target
+/tests/clippy_workspaces/default
+/tests/targets/*/_target
+**/*.rs.bk
