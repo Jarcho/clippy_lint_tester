@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  ci:
 
     runs-on: ubuntu-latest
 
@@ -20,6 +20,8 @@ jobs:
       run: cargo build --verbose
     - name: Checkout Clippy
       run: git clone -b rust-1.59.0 --depth 1 https://github.com/rust-lang/rust-clippy tests/clippy_workspaces/default
+    - name: Install toolchain for testing
+      run: rustup toolchain add nightly-2021-12-30
     - name: Run tests
       run: cargo test --verbose
     - name: Clippy
