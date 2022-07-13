@@ -6,6 +6,7 @@
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::env;
+use std::fmt::Write;
 use std::fs;
 use std::io::stdout;
 use std::io::Read;
@@ -293,7 +294,7 @@ fn check_and_format_lint_names(
     if let Some(first) = missing_args.next() {
         let mut error_message = format!("Lints not found: `{}`", first);
         for arg in missing_args {
-            error_message.push_str(&format!(", `{}`", arg));
+            write!(error_message, ", `{}`", arg).expect("Write to string succeeds");
         }
         bail!(error_message);
     }
@@ -576,10 +577,12 @@ fn format_command(command: &Command) -> String {
     let mut result = String::new();
 
     if let Some(current_dir) = command.get_current_dir() {
-        result.push_str(&format!(
+        write!(
+            result,
             "cd {} && ",
             &shell_escape::escape(current_dir.to_string_lossy()),
-        ));
+        )
+        .expect("Write to string succeeds");
     }
 
     result.push_str(&shell_escape::escape(
@@ -587,10 +590,8 @@ fn format_command(command: &Command) -> String {
     ));
 
     for arg in command.get_args() {
-        result.push_str(&format!(
-            " {}",
-            &shell_escape::escape(arg.to_string_lossy())
-        ));
+        write!(result, " {}", &shell_escape::escape(arg.to_string_lossy()))
+            .expect("Write to string succeeds");
     }
 
     result
