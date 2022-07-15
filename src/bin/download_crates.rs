@@ -133,6 +133,7 @@ fn main() -> Result<()> {
         }
 
         remove_cargo_config(crate_path)?;
+        remove_cargo_lock(crate_path)?;
 
         downloaded_crates.insert(krate.name);
     }
@@ -216,11 +217,19 @@ fn download_crate(agent: &mut Agent, krate: &Crate, path: &Path) -> Result<()> {
 }
 
 fn remove_cargo_config(crate_path: &Path) -> Result<()> {
-    match fs::remove_file(crate_path.join(".cargo").join("config")) {
+    remove_file_if_exists(&crate_path.join(".cargo").join("config"))
+}
+
+fn remove_cargo_lock(crate_path: &Path) -> Result<()> {
+    remove_file_if_exists(&crate_path.join("Cargo.lock"))
+}
+
+fn remove_file_if_exists(path: &Path) -> Result<()> {
+    match fs::remove_file(path) {
         Ok(()) => Ok(()),
         Err(err) => match err.kind() {
             io::ErrorKind::NotFound => Ok(()),
-            _ => Err(err).context("Failed to delete config file"),
+            _ => Err(err).with_context(|| format!("Failed to remove {}", path.display())),
         },
     }
 }
