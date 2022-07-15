@@ -220,10 +220,8 @@ fn disable_clippy_config(path: &Path) -> Result<()> {
     for name in &[".clippy.toml", "clippy.toml"] {
         let config_path = path.join(name);
         if config_path.exists() {
-            fs::copy(&config_path, config_path.with_extension("toml.bak"))
-                .with_context(|| format!("Writing {}", config_path.display()))?;
-            fs::remove_file(&config_path)
-                .with_context(|| format!("Deleting {}", config_path.display()))?;
+            fs::rename(&config_path, config_path.with_extension("toml.bak"))
+                .with_context(|| format!("Renaming {}", config_path.display()))?;
         }
     }
 
